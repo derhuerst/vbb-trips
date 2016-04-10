@@ -14,5 +14,19 @@
 	"repository":        "git://github.com/derhuerst/vbb-trips.git",
 	"bugs":              "https://github.com/derhuerst/vbb-trips/issues",
 	"license":           "ISC",
-	"engines" :          {"node": ">=4"}
+	"engines" :          {"node": ">=4"},
+	"devDependencies": {
+		"got":               "^6.3",
+		"csv-parse":         "^1.0.4",
+		"stream-sink":       "^1.2",
+		"cli-native":        "^1",
+		"so":                "^1.0.1",
+		"lodash.uniq":       "^4.2.1",
+		"lodash.difference": "^4.2",
+		"fs-promise":        "^0.5"
+	},
+	"scripts": {
+		"build":         "node build/01-schedules.js",
+		"prepublish":    "npm run build"
+	}
 }
