@@ -1,0 +1,18 @@
+{
+	"name":              "vbb-trips",
+	"description":       "When do trains run where in VBB?",
+	"version":           "0.1.0",
+	"main":              "index.js",
+	"files":             ["index.js", "vbb-logo.jpg"],
+	"keywords": [
+		"vbb", "berlin", "brandenburg", "public transport",
+		"lines", "trips", "journeys", "date", "time",
+		"open data", "json", "ndjson", "gtfs"
+	],
+	"author":            "Jannis R <mail@jannisr.de>",
+	"homepage":          "https://github.com/derhuerst/vbb-trips",
+	"repository":        "git://github.com/derhuerst/vbb-trips.git",
+	"bugs":              "https://github.com/derhuerst/vbb-trips/issues",
+	"license":           "ISC",
+	"engines" :          {"node": ">=4"}
+}
