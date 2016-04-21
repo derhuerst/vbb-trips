@@ -11,6 +11,7 @@ const hash     = require('shorthash').unique
 
 const lib      = require('./lib')
 const readSchedules = require('./schedules')
+const readTrips     = require('./trips')
 
 so(function* () {
 
@@ -48,8 +49,6 @@ so(function* () {
 	console.info('Reading schedules.')
 	let schedules = yield readSchedules()
 
-
-
 	console.info('Compressing schedules.')
 	const scheduleIds = keyMap(Object.keys(schedules))
 
@@ -70,36 +69,11 @@ so(function* () {
 
 
 	console.info('Reading trips.')
-	let trips = yield lib.readCsv('trips.txt', (acc, trip) => {
-		trip = {
-			  id:         parseInt(trip.trip_id)
-			, lineId:     parseInt(trip.route_id)
-			, scheduleId: scheduleIds.get(parseInt(trip.service_id))
-			, name:       trip.trip_short_name || trip.trip_headsign
-			, stops:      []
-		}
-		acc[trip.id] = trip
-		return acc
-	}, {})
+	let trips = yield readTrips(scheduleIds)
 
-	trips = yield lib.readCsv('stop_times.txt', (acc, stop) => {
-		const trip = acc[parseInt(stop.trip_id)]
-		if (!trip) return acc
-
-		trip.stops.push({
-			  s: parseInt(stop.stop_id)
-			, t: lib.parseTime(stop.departure_time)
-		})
-		return acc
-	}, trips)
-
-
-	console.info('Normalizing trips.')
+	console.info('Hashing trips.')
 	for (let id in trips) {
 		const trip = trips[id]
-
-		trip.start = trip.stops[0].t
-		for (let stop of trip.stops) {stop.t -= trip.start}
 
 		let signature = ''
 		for (let stop of trip.stops) {signature += stop.s + stop.t}
