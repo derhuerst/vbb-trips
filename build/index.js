@@ -9,7 +9,8 @@ const Download = require('download')
 const keyMap   = require('key-map')
 const hash     = require('shorthash').unique
 
-const lib      = require('./lib')
+const lib           = require('./lib')
+const readLines     = require('./lines')
 const readSchedules = require('./schedules')
 const readTrips     = require('./trips')
 
@@ -32,19 +33,7 @@ so(function* () {
 
 
 	console.info('Reading lines.')
-	const lines = yield lib.readCsv('routes.txt', (acc, line) => {
-		line = {
-			  id:       parseInt(line.route_id)
-			, agencyId: lib.parseAgency(line.agency_id)
-			, name:     line.route_short_name || line.route_long_name
-			, type:     lib.lineTypes[line.route_type] || 'unknown'
-			, variants: {}
-		}
-		acc[line.id] = line
-		return acc
-	}, {})
-
-
+	const lines = yield readLines()
 
 	console.info('Reading schedules.')
 	let schedules = yield readSchedules()
