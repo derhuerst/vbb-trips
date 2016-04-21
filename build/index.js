@@ -1,70 +1,15 @@
 'use strict'
 
-// This build scripts tries to reduce the amount of implicitly redundant data, coming from the GTFS dumps.
+// This build script tries to reduce the amount of implicitly redundant data, coming from the GTFS dumps.
 // - calendar.txt and calendar_dates.txt get merged. For each schedule, only a list of days (on which they are valid) is kept.
 // - trips.txt and stop_time.txt get merged. Because relative travel times are used, a lot of now redundant trips can be removed.
 
 const so       = require('so')
 const Download = require('download')
-const path     = require('path')
-const fs       = require('fs')
-const csv      = require('csv-parse')
-const moment   = require('moment')
 const keyMap   = require('key-map')
 const hash     = require('shorthash').unique
 
-
-
-const parseAgency = (agency) => agency.replace(/[^a-zA-Z0-9]+$/, '')
-
-const lineTypes = {
-	  100:	'regional'
-	, 102:	'regional'
-	, 109:	'suburban'
-	, 400:	'subway'
-	, 700:	'bus'
-	, 900:	'tram'
-	, 1000:	'ferry'
-}
-
-
-
-const parseDate = (date) => moment([
-	  date.substr(0, 4)
-	, date.substr(4, 2)
-	, date.substr(6, 2)
-].join('-')).valueOf()
-
-const parseTime = (time) => moment.duration(time).asMilliseconds()
-
-const day = 24 * 60 * 60 * 1000
-const daysBetween = (first, last) => {
-	const days = []
-	for (let i = first; i <= last; i += day) {days.push(i)}
-	return days
-}
-
-const equalDays = (a, b) => {
-	for (let i = 0; i < a.length; i++)
-		{if (a[i] !== b[i]) return false}
-	return true
-}
-
-const weekdays = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
-const isWeekday = (weekday) => (day) =>
-	new Date(day).getDay() === weekday
-const allDaysOfWeekday = (first, last, weekday) =>
-	daysBetween(first, last).filter(isWeekday(weekday))
-
-
-
-const dir = path.join(__dirname, 'data')
-const readCsv = (file, reducer, acc) => new Promise((yay, nay) => {
-	fs.createReadStream(path.join(dir, file))
-	.pipe(csv({columns: true})).on('error', nay)
-	.on('data', (data) => acc = reducer(acc, data))
-	.on('end', () => yay(acc))
-})
+const lib      = require('./lib')
 
 so(function* () {
 
@@ -84,28 +29,29 @@ so(function* () {
 
 
 
-	// console.info('Reading lines.')
-	// const lines = yield readCsv('routes.txt', (acc, line) => {
-	// 	line = {
-	// 		  id:       parseInt(line.route_id)
-	// 		, agencyId: parseAgency(line.agency_id)
-	// 		, name:     line.route_short_name || line.route_long_name
-	// 		, type:     lineTypes[line.route_type] || 'unknown'
-	// 	}
-	// 	acc[line.id] = line
-	// 	return acc
-	// }, {})
+	console.info('Reading lines.')
+	const lines = yield lib.readCsv('routes.txt', (acc, line) => {
+		line = {
+			  id:       parseInt(line.route_id)
+			, agencyId: lib.parseAgency(line.agency_id)
+			, name:     line.route_short_name || line.route_long_name
+			, type:     lib.lineTypes[line.route_type] || 'unknown'
+			, variants: {}
+		}
+		acc[line.id] = line
+		return acc
+	}, {})
 
 
 
 	console.info('Reading schedules.')
-	let schedules = yield readCsv('calendar.txt', (acc, schedule) => {
+	let schedules = yield lib.readCsv('calendar.txt', (acc, schedule) => {
 		let days  = []
-		const first = parseDate(schedule.start_date)
-		const last  = parseDate(schedule.end_date)
+		const first = lib.parseDate(schedule.start_date)
+		const last  = lib.parseDate(schedule.end_date)
 		// assemble the list of days
-		for (let i = 0; i < weekdays.length; i++) {
-			if (parseInt(schedule[weekdays[i]]))
+		for (let i = 0; i < lib.weekdays.length; i++) {
+			if (parseInt(schedule[lib.weekdays[i]]))
 				days = days.concat(allDaysOfWeekday(first, last, i))
 		}
 
@@ -114,11 +60,11 @@ so(function* () {
 		return acc
 	}, {})
 
-	schedules = yield readCsv('calendar_dates.txt', (acc, exception) => {
+	schedules = yield lib.readCsv('calendar_dates.txt', (acc, exception) => {
 		const schedule = acc[parseInt(exception.service_id)]
 		if (!schedule) return acc
 
-		const date = parseDate(exception.date)
+		const date = lib.parseDate(exception.date)
 		const i = schedule.days.indexOf(date)
 		if (parseInt(exception.exception_type) > 0) {
 			if (i < 0) schedule.days.push(date)
@@ -140,7 +86,7 @@ so(function* () {
 			const schedule2 = schedules[id2]
 			if (schedule1.id === schedule2.id) continue
 
-			if (equalDays(schedule1.days, schedule2.days)) {
+			if (lib.equalListsOfDays(schedule1.days, schedule2.days)) {
 				scheduleIds.map(schedule2.id, schedule1.id)
 				delete schedules[schedule2.id]
 				break
@@ -151,7 +97,7 @@ so(function* () {
 
 
 	console.info('Reading trips.')
-	let trips = yield readCsv('trips.txt', (acc, trip) => {
+	let trips = yield lib.readCsv('trips.txt', (acc, trip) => {
 		trip = {
 			  id:         parseInt(trip.trip_id)
 			, lineId:     parseInt(trip.route_id)
@@ -163,24 +109,23 @@ so(function* () {
 		return acc
 	}, {})
 
-	trips = yield readCsv('stop_times.txt', (acc, stop) => {
+	trips = yield lib.readCsv('stop_times.txt', (acc, stop) => {
 		const trip = acc[parseInt(stop.trip_id)]
 		if (!trip) return acc
 
 		trip.stops.push({
 			  s: parseInt(stop.stop_id)
-			, t: parseTime(stop.departure_time)
+			, t: lib.parseTime(stop.departure_time)
 		})
 		return acc
 	}, trips)
-
 
 
 	console.info('Normalizing trips.')
 	for (let id in trips) {
 		const trip = trips[id]
 
-		trip.start = trip.stops[0]
+		trip.start = trip.stops[0].t
 		for (let stop of trip.stops) {stop.t -= trip.start}
 
 		let signature = ''
@@ -193,24 +138,22 @@ so(function* () {
 	console.info('Compressing trips.')
 	const tripIds = keyMap(Object.keys(trips))
 
-	for (let id1 in trips) {
-		const trip1 = trips[id1]
-		for (let id2 in trips) {
-			const trip2 = trips[id2]
-			if (trip1.id === trip2.id) continue
+	const tripsByHash = {}
+	for (let id in trips) {
+		const trip = trips[id]
 
-			if (trip1.scheduleId === trip2.scheduleId
-			&&      trip1.lineId === trip2.lineId
-			&&   trip1.signature === trip2.signature) {
-				tripIds.map(trip2.id, trip1.id)
-				console.log(trip2.id + '->' + trip1.id)
-				delete trips[trip2.id]
-				break
-			}
-		}
+		let signature = ''
+		for (let stop of trip.stops) {signature += stop.s + stop.t}
+
+		let duplicate
+		if (signature in tripsByHash) {
+			duplicate = tripsByHash[signature]
+			tripIds.map(trip.id, duplicate.id)
+			delete trips[trip.id]
+		} else tripsByHash[signature] = trip
+
+		console.log(!!lines[trip.lineId])
 	}
-
-	console.log(trips[tripIds.get(1)])
 
 })()
 .catch((err) => console.error(err.stack))
