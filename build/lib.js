@@ -37,12 +37,6 @@ const daysBetween = (first, last) => {
 	return days
 }
 
-const equalListsOfDays = (a, b) => {
-	for (let i = 0; i < a.length; i++)
-		{if (a[i] !== b[i]) return false}
-	return true
-}
-
 const weekdays = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
 
 const isWeekday = (weekday) => (day) =>
@@ -72,7 +66,7 @@ const writeNdjson = (file) => {
 
 module.exports = {
 	parseAgency, lineTypes,
-	parseDate, parseTime, daysBetween, equalListsOfDays,
+	parseDate, parseTime, daysBetween,
 	weekdays, isWeekday, allDaysOfWeekday,
 	readCsv, writeNdjson
 }

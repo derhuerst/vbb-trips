@@ -9,6 +9,7 @@ const Download = require('download')
 const keyMap   = require('key-map')
 const hash     = require('shorthash').unique
 const pick     = require('lodash.pick')
+const arrEqual = require('array-equal')
 
 const lib           = require('./lib')
 const readLines     = require('./read-lines')
@@ -46,7 +47,8 @@ so(function* () {
 			const schedule2 = schedules[id2]
 			if (schedule1.id === schedule2.id) continue
 
-			if (lib.equalListsOfDays(schedule1.days, schedule2.days)) {
+			if (arrEqual(schedule1.days, schedule2.days)) {
+				console.info(schedule2.id + ' -> ' + schedule1.id)
 				scheduleIds.map(schedule2.id, schedule1.id)
 				delete schedules[schedule2.id]
 				break
@@ -84,7 +86,7 @@ so(function* () {
 
 
 
-	console.info('Writing trips.')
+	console.info('Writing lines.')
 	let dest = lib.writeNdjson('lines.ndjson')
 	for (let id in lines) {
 		const line = lines[id]

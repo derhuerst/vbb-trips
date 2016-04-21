@@ -21,7 +21,7 @@ const readSchedules = so(function* () {
 		}
 
 		const id = parseInt(sched.service_id)
-		acc[id] = {id, first, last, days}
+		acc[id] = {id, days}
 		return acc
 	}, {})
 
