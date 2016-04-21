@@ -6,4 +6,5 @@ node_modules
 npm-debug.log
 
 build/data/*.txt
+data/*.ndjson
 schedules.json
