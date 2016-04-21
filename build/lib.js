@@ -4,6 +4,7 @@ const moment   = require('moment')
 const path     = require('path')
 const fs       = require('fs')
 const csv      = require('csv-parse')
+const ndjson   = require('ndjson')
 
 
 
@@ -53,6 +54,7 @@ const allDaysOfWeekday = (first, last, weekday) =>
 
 
 const dir = path.join(__dirname, 'data')
+
 const readCsv = (file, reducer, acc) => new Promise((yay, nay) => {
 	fs.createReadStream(path.join(dir, file))
 	.pipe(csv({columns: true})).on('error', nay)
@@ -60,11 +62,17 @@ const readCsv = (file, reducer, acc) => new Promise((yay, nay) => {
 	.on('end', () => yay(acc))
 })
 
+const writeNdjson = (file) => {
+	const s = ndjson.stringify()
+	s.pipe(fs.createWriteStream(path.join(__dirname, '../data', file)))
+	return s
+}
+
 
 
 module.exports = {
 	parseAgency, lineTypes,
 	parseDate, parseTime, daysBetween, equalListsOfDays,
 	weekdays, isWeekday, allDaysOfWeekday,
-	readCsv
+	readCsv, writeNdjson
 }

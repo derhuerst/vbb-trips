@@ -8,11 +8,12 @@ const so       = require('so')
 const Download = require('download')
 const keyMap   = require('key-map')
 const hash     = require('shorthash').unique
+const pick     = require('lodash.pick')
 
 const lib           = require('./lib')
-const readLines     = require('./lines')
-const readSchedules = require('./schedules')
-const readTrips     = require('./trips')
+const readLines     = require('./read-lines')
+const readSchedules = require('./read-schedules')
+const readTrips     = require('./read-trips')
 
 so(function* () {
 
@@ -37,8 +38,6 @@ so(function* () {
 
 	console.info('Reading schedules.')
 	let schedules = yield readSchedules()
-
-	console.info('Compressing schedules.')
 	const scheduleIds = keyMap(Object.keys(schedules))
 
 	for (let id1 in schedules) {
@@ -60,36 +59,50 @@ so(function* () {
 	console.info('Reading trips.')
 	let trips = yield readTrips(scheduleIds)
 
-	console.info('Hashing trips.')
+	console.info('Reducing trips into lines.')
 	for (let id in trips) {
 		const trip = trips[id]
+		const line = lines[trip.lineId]
+		const schedule = schedules[scheduleIds.get(trip.scheduleId)]
+		if (!schedule) continue
 
 		let signature = ''
 		for (let stop of trip.stops) {signature += stop.s + stop.t}
-		trip.signature = hash(signature)
+		signature = hash(signature)
+
+		const starts = schedule.days.map((d) => d + trip.start)
+		if (signature in line.routes) line.routes[signature].when =
+			line.routes[signature].when.concat(starts)
+		else line.routes[signature] = {
+			  lineId: line.id
+			, stops:  trip.stops
+			, when:   starts
+		}
+
+		delete trips[trip.id]
 	}
 
 
 
-	console.info('Compressing trips.')
-	const tripIds = keyMap(Object.keys(trips))
-
-	const tripsByHash = {}
-	for (let id in trips) {
-		const trip = trips[id]
-
-		let signature = ''
-		for (let stop of trip.stops) {signature += stop.s + stop.t}
-
-		let duplicate
-		if (signature in tripsByHash) {
-			duplicate = tripsByHash[signature]
-			tripIds.map(trip.id, duplicate.id)
-			delete trips[trip.id]
-		} else tripsByHash[signature] = trip
-
-		console.log(!!lines[trip.lineId])
+	console.info('Writing trips.')
+	let dest = lib.writeNdjson('lines.ndjson')
+	for (let id in lines) {
+		const line = lines[id]
+		dest.write(pick(line, ['id', 'name', 'type']))
 	}
+	dest.end()
+
+
+
+	console.info('Writing routes.')
+	dest = lib.writeNdjson('routes.ndjson')
+	for (let lineId in lines) {
+		const line = lines[lineId]
+		for (let signature in line.routes) {
+			dest.write(line.routes[signature])
+		}
+	}
+	dest.end()
 
 })()
 .catch((err) => console.error(err.stack))

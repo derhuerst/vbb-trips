@@ -5,15 +5,18 @@ const lib      = require('./lib')
 
 
 
-const trips = so(function* (scheduleIds) {
+const readTrips = so(function* (scheduleIds) {
 
 
 
 	let trips = yield lib.readCsv('trips.txt', (acc, trip) => {
+		const scheduleId = parseInt(scheduleIds.get(parseInt(trip.service_id)))
+		if (!scheduleId) console.error('Invalid service_id', trip.service_id)
+
 		trip = {
 			  id:         parseInt(trip.trip_id)
 			, lineId:     parseInt(trip.route_id)
-			, scheduleId: scheduleIds.get(parseInt(trip.service_id))
+			, scheduleId: scheduleId
 			, name:       trip.trip_short_name || trip.trip_headsign
 			, stops:      []
 		}
@@ -38,4 +41,4 @@ const trips = so(function* (scheduleIds) {
 	return trips
 })
 
-module.exports = trips
+module.exports = readTrips

@@ -5,7 +5,7 @@ const lib      = require('./lib')
 
 
 
-const schedules = so(function* () {
+const readSchedules = so(function* () {
 
 
 
@@ -45,4 +45,4 @@ const schedules = so(function* () {
 	return schedules
 })
 
-module.exports = schedules
+module.exports = readSchedules

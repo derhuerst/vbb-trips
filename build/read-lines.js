@@ -5,16 +5,16 @@ const lib      = require('./lib')
 
 
 
-const lines = () => lib.readCsv('routes.txt', (acc, line) => {
+const readLines = () => lib.readCsv('routes.txt', (acc, line) => {
 	line = {
 		  id:       parseInt(line.route_id)
 		, agencyId: lib.parseAgency(line.agency_id)
 		, name:     line.route_short_name || line.route_long_name
 		, type:     lib.lineTypes[line.route_type] || 'unknown'
-		, variants: {}
+		, routes:   {}
 	}
 	acc[line.id] = line
 	return acc
 }, {})
 
-module.exports = lines
+module.exports = readLines
