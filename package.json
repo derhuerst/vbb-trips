@@ -26,7 +26,7 @@
 		"fs-promise":        "^0.5"
 	},
 	"scripts": {
-		"build":         "node build/01-schedules.js",
+		"build":         "node build/index.js",
 		"prepublish":    "npm run build"
 	}
 }

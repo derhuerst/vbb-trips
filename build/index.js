@@ -10,27 +10,31 @@ const keyMap   = require('key-map')
 const hash     = require('shorthash').unique
 const pick     = require('lodash.pick')
 const arrEqual = require('array-equal')
+const fs       = require('fs-promise')
+const path     = require('path')
 
 const lib           = require('./lib')
 const readLines     = require('./read-lines')
 const readSchedules = require('./read-schedules')
 const readTrips     = require('./read-trips')
 
+const dir = path.join(__dirname, 'data')
+
 so(function* () {
 
 
 
-	// console.info('Downloading GTFS data.')
-	// yield new Promise((yay, nay) => {
-	// 	const base = 'https://raw.githubusercontent.com/derhuerst/vbb-gtfs/master/'
-	// 	new Download({extract: true, mode: '755', strip: 1})
-	// 	.get(base + 'routes.txt')
-	// 	.get(base + 'calendar.txt')
-	// 	.get(base + 'calendar_dates.txt')
-	// 	.get(base + 'trips.txt')
-	// 	.get(base + 'stop_times.txt')
-	// 	.dest(dir).run((err) => {if (err) nay(err); else yay()})
-	// })
+	console.info('Downloading GTFS data.')
+	yield new Promise((yay, nay) => {
+		const base = 'https://raw.githubusercontent.com/derhuerst/vbb-gtfs/master/'
+		new Download({extract: true, mode: '755', strip: 1})
+		.get(base + 'routes.txt')
+		.get(base + 'calendar.txt')
+		.get(base + 'calendar_dates.txt')
+		.get(base + 'trips.txt')
+		.get(base + 'stop_times.txt')
+		.dest(dir).run((err) => {if (err) nay(err); else yay()})
+	})
 
 
 
@@ -105,6 +109,15 @@ so(function* () {
 		}
 	}
 	dest.end()
+
+
+
+	console.info('Cleaning up.')
+	yield fs.unlink(path.join(dir, 'calendar.txt'))
+	yield fs.unlink(path.join(dir, 'calendar_dates.txt'))
+	yield fs.unlink(path.join(dir, 'routes.txt'))
+	yield fs.unlink(path.join(dir, 'stop_times.txt'))
+	yield fs.unlink(path.join(dir, 'trips.txt'))
 
 })()
 .catch((err) => console.error(err.stack))
