@@ -10,6 +10,7 @@ const keyMap   = require('key-map')
 const hash     = require('shorthash').unique
 
 const lib      = require('./lib')
+const readSchedules = require('./schedules')
 
 so(function* () {
 
@@ -45,35 +46,7 @@ so(function* () {
 
 
 	console.info('Reading schedules.')
-	let schedules = yield lib.readCsv('calendar.txt', (acc, schedule) => {
-		let days  = []
-		const first = lib.parseDate(schedule.start_date)
-		const last  = lib.parseDate(schedule.end_date)
-		// assemble the list of days
-		for (let i = 0; i < lib.weekdays.length; i++) {
-			if (parseInt(schedule[lib.weekdays[i]]))
-				days = days.concat(allDaysOfWeekday(first, last, i))
-		}
-
-		acc[parseInt(schedule.service_id)] =
-			{id: parseInt(schedule.service_id), first, last, days}
-		return acc
-	}, {})
-
-	schedules = yield lib.readCsv('calendar_dates.txt', (acc, exception) => {
-		const schedule = acc[parseInt(exception.service_id)]
-		if (!schedule) return acc
-
-		const date = lib.parseDate(exception.date)
-		const i = schedule.days.indexOf(date)
-		if (parseInt(exception.exception_type) > 0) {
-			if (i < 0) schedule.days.push(date)
-		} else {
-			if (i >= 0) schedule.days.splice(i, 1)
-		}
-
-		return acc
-	}, schedules)
+	let schedules = yield readSchedules()
 
 
 
