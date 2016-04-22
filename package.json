@@ -27,6 +27,7 @@
 	},
 	"scripts": {
 		"build":         "node build/index.js",
-		"prepublish":    "npm run build"
+		"test":          "tape test.js | tap-min",
+		"prepublish":    "npm run build; npm test"
 	}
 }
