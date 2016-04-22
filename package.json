@@ -15,15 +15,23 @@
 	"bugs":              "https://github.com/derhuerst/vbb-trips/issues",
 	"license":           "ISC",
 	"engines" :          {"node": ">=4"},
+	"dependencies": {
+		"ndjson":        "^1.4.3",
+		"stream-filter": "^1",
+		"stream-sink":   "^1.2"
+	},
 	"devDependencies": {
-		"got":               "^6.3",
-		"csv-parse":         "^1.0.4",
-		"stream-sink":       "^1.2",
-		"cli-native":        "^1",
-		"so":                "^1.0.1",
-		"lodash.uniq":       "^4.2.1",
-		"lodash.difference": "^4.2",
-		"fs-promise":        "^0.5"
+		"so":            "^1.0.1",
+		"download":      "^4.4.3",
+		"key-map":       "^0.1",
+		"shorthash":     "^0.0.2",
+		"lodash.pick":   "^4.2",
+		"array-equal":   "^1",
+		"fs-promise":    "^0.5",
+		"moment":        "^2.13",
+		"csv-parse":     "^1.0.4",
+		"tape-catch":    "^1.0.4",
+		"tap-min":       "^1.1"
 	},
 	"scripts": {
 		"build":         "node build/index.js",
