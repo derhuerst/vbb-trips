@@ -73,10 +73,10 @@ so(function* () {
 		if (!schedule) continue
 
 		let signature = ''
-		for (let stop of trip.stops) {signature += stop.s + stop.t}
+		for (let stop of trip.stops) {signature += ',' + stop.s + ',' + stop.t}
 		signature = hash(signature)
 
-		const starts = schedule.days.map((d) => d + trip.start)
+		const starts = schedule.days.map((d) => (d + trip.start) / 1000)
 		if (signature in line.routes) line.routes[signature].when =
 			line.routes[signature].when.concat(starts)
 		else line.routes[signature] = {

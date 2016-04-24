@@ -4,6 +4,7 @@ const ndjson    = require('ndjson')
 const filter    = require('stream-filter')
 const fs        = require('fs')
 const path      = require('path')
+const map       = require('through2-map')
 
 
 
@@ -25,6 +26,14 @@ const toPromise = (stream) => new Promise((yay, nay) => {
 	.on('end', () => yay(acc))
 })
 
+const decompress = (route) => {
+	if (!Array.isArray(route.when)) return route
+	for (let i = 0; i < route.when.length; i++) {
+		route.when[i] *= 1000 // decompress
+	}
+	return route
+}
+
 
 
 const base = path.join(__dirname, 'data')
@@ -35,7 +44,7 @@ const selector = (file) => function (/* promised, pattern */) {
 	let   promised = !!args.shift()
 
 	let stream = fs.createReadStream(path.join(base, file))
-	.pipe(ndjson.parse())
+	.pipe(ndjson.parse()).pipe(map.obj(decompress))
 
 	if ('number' === typeof pattern)
 		stream = stream.pipe(filter(filterById(pattern)))
