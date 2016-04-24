@@ -1,10 +1,9 @@
 'use strict'
 
-const ndjson       = require('ndjson')
-const filterStream = require('stream-filter')
-const fs           = require('fs')
-const path         = require('path')
-const sink         = require('stream-sink')
+const ndjson    = require('ndjson')
+const filter    = require('stream-filter')
+const fs        = require('fs')
+const path      = require('path')
 
 
 
@@ -19,6 +18,13 @@ const filterByKeys = (pattern) => (data) => {
 	return true
 }
 
+const toPromise = (stream) => new Promise((yay, nay) => {
+	const acc = []
+	stream.on('error', nay)
+	.on('data', (data) => acc.push(data))
+	.on('end', () => yay(acc))
+})
+
 
 
 const base = path.join(__dirname, 'data')
@@ -28,25 +34,16 @@ const selector = (file) => function (/* promised, pattern */) {
 	let   pattern = args.pop()
 	let   promised = !!args.shift()
 
-	const reader = fs.createReadStream(path.join(base, file))
-	const parser = reader.pipe(ndjson.parse())
-	let filter
+	let stream = fs.createReadStream(path.join(base, file))
+	.pipe(ndjson.parse())
 
-	if (pattern === 'all' || pattern === undefined)
-		filter = parser // no filter
-	else if ('number' === typeof pattern)
-		filter = parser.pipe(filterStream(filterById(pattern)))
-	else filter = parser.pipe(filterStream(filterByKeys(pattern)))
+	if ('number' === typeof pattern)
+		stream = stream.pipe(filter(filterById(pattern)))
+	else if (pattern && pattern !== 'all')
+		stream = stream.pipe(filter(filterByKeys(pattern)))
 
-	if (promised === true) return new Promise((yay, nay) => {
-		reader.on('error', nay)
-		parser.on('error', nay)
-		filter.on('error', nay)
-
-		filter.pipe(sink({objectMode: true}))
-		.on('error', nay).on('data', yay)
-	})
-	else return filter
+	if (promised === true) return toPromise(stream)
+	else return stream
 }
 
 const lines  = selector('lines.ndjson')
