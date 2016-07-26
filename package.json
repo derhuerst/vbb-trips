@@ -17,7 +17,8 @@
 	"engines" :          {"node": ">=4"},
 	"dependencies": {
 		"ndjson":        "^1.4.3",
-		"stream-filter": "^1"
+		"stream-filter": "^1",
+		"through2-map": "^2"
 	},
 	"devDependencies": {
 		"so":            "^1.0.1",
@@ -29,6 +30,7 @@
 		"fs-promise":    "^0.5",
 		"moment":        "^2.13",
 		"csv-parse":     "^1.0.4",
+		"tape": "^4.6",
 		"tape-catch":    "^1.0.4",
 		"tap-min":       "^1.1"
 	},
