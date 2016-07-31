@@ -1,9 +1,9 @@
 {
 	"name":              "vbb-trips",
 	"description":       "When do trains run where in VBB?",
-	"version":           "0.3.0",
+	"version":           "0.3.1",
 	"main":              "index.js",
-	"files":             ["index.js", "vbb-logo.jpg"],
+	"files":             ["index.js", "data/*"],
 	"keywords": [
 		"vbb", "berlin", "brandenburg", "public transport",
 		"lines", "trips", "journeys", "date", "time",
