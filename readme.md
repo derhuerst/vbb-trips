@@ -7,6 +7,7 @@
 [![dependency status](https://img.shields.io/david/derhuerst/vbb-trips.svg)](https://david-dm.org/derhuerst/vbb-trips)
 [![dev dependency status](https://img.shields.io/david/dev/derhuerst/vbb-trips.svg)](https://david-dm.org/derhuerst/vbb-trips#info=devDependencies)
 ![ISC-licensed](https://img.shields.io/github/license/derhuerst/vbb-trips.svg)
+[![gitter channel](https://badges.gitter.im/derhuerst/vbb-rest.svg)](https://gitter.im/derhuerst/vbb-rest)
 
 
 ## Installing
@@ -30,7 +31,7 @@ A route looks like this:
 ```js
 {
 	lineId: 1,
-	stops: [ // milliseconds from last stop
+	stops: [ // milliseconds since departure at first stop
 		{s: 9230999, t: 0},
 		{s: 9230400, t: 360000},
 		{s: 9220019, t: 840000},
