@@ -3,7 +3,7 @@
 const moment   = require('moment')
 const path     = require('path')
 const fs       = require('fs')
-const csv      = require('csv-parse')
+const csv = require('csv-parser')
 const ndjson   = require('ndjson')
 
 
@@ -51,7 +51,7 @@ const dir = path.join(__dirname, 'data')
 
 const readCsv = (file, reducer, acc) => new Promise((yay, nay) => {
 	fs.createReadStream(path.join(dir, file))
-	.pipe(csv({columns: true})).on('error', nay)
+	.pipe(csv()).on('error', nay)
 	.on('data', (data) => acc = reducer(acc, data))
 	.on('end', () => yay(acc))
 })

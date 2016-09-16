@@ -29,7 +29,7 @@
 		"array-equal":   "^1",
 		"fs-promise":    "^0.5",
 		"moment":        "^2.13",
-		"csv-parse":     "^1.0.4",
+		"csv-parser": "^1.11",
 		"tape": "^4.6",
 		"tape-catch":    "^1.0.4",
 		"tap-min":       "^1.1"
