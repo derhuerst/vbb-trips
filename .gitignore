@@ -5,6 +5,6 @@ Thumbs.db
 node_modules
 npm-debug.log
 
-build/data/*.txt
+build/data
 data/*.ndjson
 schedules.json

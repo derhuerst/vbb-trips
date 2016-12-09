@@ -22,7 +22,7 @@
 	},
 	"devDependencies": {
 		"so":            "^1.0.1",
-		"download":      "^4.4.3",
+		"got": "^6.6.3",
 		"key-map":       "^0.1",
 		"shorthash":     "^0.0.2",
 		"lodash.pick":   "^4.2",
@@ -35,8 +35,10 @@
 		"tap-min":       "^1.1"
 	},
 	"scripts": {
-		"build":         "node build/index.js",
-		"test":          "tape test.js | tap-min",
-		"prepublish":    "npm run build; npm test"
+		"download": "curl -L 'https://github.com/derhuerst/vbb-gtfs/archive/master.zip' | tar -xf- --strip-components 1 build/data/",
+		"cleanup": "rm build/data/*.txt",
+		"build": "npm run download && node build/index.js && npm run cleanup",
+		"test": "tape test.js | tap-min",
+		"prepublish": "npm run build && npm test"
 	}
 }
