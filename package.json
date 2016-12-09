@@ -16,23 +16,23 @@
 	"license":           "ISC",
 	"engines" :          {"node": ">=4"},
 	"dependencies": {
-		"ndjson":        "^1.4.3",
-		"stream-filter": "^1",
-		"through2-map": "^2"
+		"ndjson": "^1.5.0",
+		"stream-filter": "^2.1.0",
+		"through2-map": "^3.0.0"
 	},
 	"devDependencies": {
 		"so":            "^1.0.1",
 		"got": "^6.6.3",
 		"key-map":       "^0.1",
 		"shorthash":     "^0.0.2",
-		"lodash.pick":   "^4.2",
+		"lodash.pick": "^4.4.0",
 		"array-equal":   "^1",
-		"fs-promise":    "^0.5",
-		"moment":        "^2.13",
+		"fs-promise": "^1.0.0",
+		"moment": "^2.17.1",
 		"csv-parser": "^1.11",
-		"tape": "^4.6",
+		"tape": "^4.6.3",
 		"tape-catch":    "^1.0.4",
-		"tap-min":       "^1.1"
+		"tap-min": "derhuerst/tap-min"
 	},
 	"scripts": {
 		"download": "curl -L 'https://github.com/derhuerst/vbb-gtfs/archive/master.zip' | tar -xf- --strip-components 1 build/data/",
