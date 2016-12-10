@@ -35,7 +35,7 @@
 		"tap-min": "derhuerst/tap-min"
 	},
 	"scripts": {
-		"download": "curl -L 'https://github.com/derhuerst/vbb-gtfs/archive/master.zip' | tar -xf- --strip-components 1 -C build/data/",
+		"download": "./download.sh",
 		"cleanup": "rm build/data/*.txt",
 		"build": "npm run download && node build/index.js && npm run cleanup",
 		"test": "tape test.js | tap-min",
