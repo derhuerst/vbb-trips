@@ -8,11 +8,11 @@ const data = require('./index')
 test('load single line', (t) => {
 	t.plan(3)
 
-	data.lines(true, 1)
+	data.lines(true, 17525)
 	.then((lines) => {
 		const line = lines[0]
 
-		t.equal(line.id, 1)
+		t.equal(line.id, 17525)
 		t.equal(typeof line.name, 'string')
 		t.equal(typeof line.type, 'string')
 	})
