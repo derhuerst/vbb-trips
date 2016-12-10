@@ -16,6 +16,7 @@ test('load single line', (t) => {
 		t.equal(typeof line.name, 'string')
 		t.equal(typeof line.type, 'string')
 	})
+	.catch(t.fail)
 })
 
 test('load multiple routes', (t) => {

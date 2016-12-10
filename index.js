@@ -47,9 +47,9 @@ const selector = (file) => function (/* promised, pattern */) {
 	.pipe(ndjson.parse()).pipe(map.obj(decompress))
 
 	if ('number' === typeof pattern)
-		stream = stream.pipe(filter(filterById(pattern)))
+		stream = stream.pipe(filter.obj(filterById(pattern)))
 	else if (pattern && pattern !== 'all')
-		stream = stream.pipe(filter(filterByKeys(pattern)))
+		stream = stream.pipe(filter.obj(filterByKeys(pattern)))
 
 	if (promised === true) return toPromise(stream)
 	else return stream
