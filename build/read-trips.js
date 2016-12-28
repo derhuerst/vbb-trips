@@ -25,10 +25,10 @@ const readTrips = so(function* (scheduleIds) {
 	}, {})
 
 	trips = yield lib.readCsv('stop_times.txt', (acc, stop) => {
-		const trip = acc[parseInt(stop.trip_id)]
+		const trip = acc[stop.trip_id]
 		if (!trip) return acc
 
-		const station = parseInt(stop.stop_id)
+		const station = stop.stop_id
 		const when    = lib.parseTime(stop.departure_time)
 
 		if (trip.stops.length === 0) trip.start = when
