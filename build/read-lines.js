@@ -7,7 +7,7 @@ const lib      = require('./lib')
 
 const readLines = () => lib.readCsv('routes.txt', (acc, line) => {
 	line = {
-		  id:       parseInt(line.route_id)
+		  id:       line.route_id
 		, agencyId: lib.parseAgency(line.agency_id)
 		, name:     line.route_short_name || line.route_long_name
 		, type:     lib.lineTypes[line.route_type] || 'unknown'

@@ -6,13 +6,14 @@ const data = require('./index')
 
 
 test('load single line', (t) => {
-	t.plan(3)
+	t.plan(4)
 
-	data.lines(true, 17525)
+	data.lines(true, '17525_400')
 	.then((lines) => {
 		const line = lines[0]
+		t.ok(line, 'line does not exist')
 
-		t.equal(line.id, 17525)
+		t.equal(line.id, '17525_400')
 		t.equal(typeof line.name, 'string')
 		t.equal(typeof line.type, 'string')
 	})
@@ -20,9 +21,9 @@ test('load single line', (t) => {
 })
 
 test('load multiple routes', (t) => {
-	data.routes({lineId: 1})
+	data.routes({lineId: '17525_400'})
 	.on('data', (route) => {
-		t.equal(route.lineId, 1)
+		t.equal(route.lineId, '17525_400')
 	})
 	.on('end', () => t.end())
 })
