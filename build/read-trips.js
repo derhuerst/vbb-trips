@@ -14,9 +14,9 @@ const readTrips = so(function* (scheduleIds) {
 		if (!scheduleId) console.error('Invalid service_id', trip.service_id)
 
 		trip = {
-			  id:         parseInt(trip.trip_id)
+			  id: trip.trip_id
 			, lineId:     trip.route_id
-			, scheduleId: scheduleId
+			, scheduleId
 			, name:       trip.trip_short_name || trip.trip_headsign
 			, stops:      []
 		}
