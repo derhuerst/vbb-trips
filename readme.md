@@ -1,6 +1,6 @@
 # vbb-trips 🚏
 
-**Raw data about when VBB trains stop at which stations.**
+**Raw data about when VBB trains stop at which stations.** Computed from [open](http://daten.berlin.de/datensaetze/vbb-fahrplandaten-januar-2017-bis-dezember-2017) [GTFS](https://developers.google.com/transit/gtfs/) [data](https://vbb-gtfs.jannisr.de/).
 
 [![npm version](https://img.shields.io/npm/v/vbb-trips.svg)](https://www.npmjs.com/package/vbb-trips)
 [![build status](https://img.shields.io/travis/derhuerst/vbb-trips.svg)](https://travis-ci.org/derhuerst/vbb-trips)
@@ -22,32 +22,30 @@ npm install vbb-trips
 ```js
 const data = require('vbb-trips')
 
-data.lines(true, 1).then(console.log) // query a single line
-data.routes({lineId: 1}).on('data', console.log) // filter routes
+data.lines(true, '17289_700').then(console.log) // query a single line
+data.routes({lineId: '17289_700'}).on('data', console.log) // filter routes
 ```
 
 A route looks like this:
 
 ```js
 {
-	lineId: 1,
+	lineId: '17289_700',
 	stops: [ // milliseconds since departure at first stop
-		{s: 9230999, t: 0},
-		{s: 9230400, t: 360000},
-		{s: 9220019, t: 840000},
-		{s: 9220070, t: 1260000},
-		{s: 9220114, t: 1560000},
-		{s: 9220001, t: 1680000},
-		{s: 9260024, t: 2820000}
+		{s: '070101006736', t: 0},
+		{s: '070101007156', t: 120000},
+		{s: '070101007309', t: 180000},
+		{s: '070101005243', t: 240000},
+		{s: '070101007160', t: 300000},
+		// …
 	],
 	when: [ // these are timestamps of the first stop
-		1458791100000,
-		1459219500000,
-		1459305900000,
-		…
-		1481082300000,
-		1481168700000,
-		1481255100000
+		1485152520000,
+		1485757320000,
+		1486362120000,
+		1486966920000,
+		1487571720000,
+		// …
 	]
 }
 ```
