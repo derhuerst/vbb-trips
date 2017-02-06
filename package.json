@@ -32,7 +32,7 @@
 		"csv-parser": "^1.11",
 		"tape": "^4.6.3",
 		"tape-catch":    "^1.0.4",
-		"tap-min": "derhuerst/tap-min"
+		"tap-min": "^1.2.0"
 	},
 	"scripts": {
 		"download": "./download.sh",

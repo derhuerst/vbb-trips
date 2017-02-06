@@ -16,6 +16,7 @@ test('load single line', (t) => {
 		t.equal(line.id, '17525_400')
 		t.equal(typeof line.name, 'string')
 		t.equal(typeof line.type, 'string')
+		t.equal(typeof line.shapeId, 'string')
 	})
 	.catch(t.fail)
 })
