@@ -6,7 +6,7 @@ const data = require('./index')
 
 
 test('load single line', (t) => {
-	t.plan(4)
+	t.plan(3)
 
 	data.lines(true, '17525_400')
 	.then((lines) => {
