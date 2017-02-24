@@ -10,13 +10,13 @@ test('load single line', (t) => {
 
 	data.lines(true, '17525_400')
 	.then((lines) => {
-		const line = lines[0]
+		const line = lines.find((line) => line.id === '17525_400')
 		t.ok(line, 'line does not exist')
 
-		t.equal(line.id, '17525_400')
 		t.equal(typeof line.name, 'string')
 		t.equal(typeof line.type, 'string')
-		t.equal(typeof line.shapeId, 'string')
+		// todo
+		// t.equal(typeof line.shapeId, 'string')
 	})
 	.catch(t.fail)
 })
