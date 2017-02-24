@@ -1,7 +1,7 @@
 {
 	"name":              "vbb-trips",
 	"description":       "When do trains run where in VBB?",
-	"version":           "1.2.0",
+	"version":           "1.3.0",
 	"main":              "index.js",
 	"files":             ["index.js", "data/*"],
 	"keywords": [
@@ -14,7 +14,7 @@
 	"repository":        "git://github.com/derhuerst/vbb-trips.git",
 	"bugs":              "https://github.com/derhuerst/vbb-trips/issues",
 	"license":           "ISC",
-	"engines" :          {"node": ">=4"},
+	"engines" :          {"node": ">=6"},
 	"dependencies": {
 		"ndjson": "^1.5.0",
 		"stream-filter": "^2.1.0",
