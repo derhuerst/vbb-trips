@@ -10,7 +10,17 @@ const ndjson   = require('ndjson')
 
 const parseAgency = (agency) => agency.replace(/[^a-zA-Z0-9]+$/, '')
 
-const lineTypes = {
+const modes = {
+	  100:	'train'
+	, 102:	'train'
+	, 109:	'train'
+	, 400:	'train'
+	, 700:	'bus'
+	, 900:	'tram'
+	, 1000:	'ferry'
+}
+
+const products = {
 	  100:	'regional'
 	, 102:	'regional'
 	, 109:	'suburban'
@@ -65,7 +75,7 @@ const writeNdjson = (file) => {
 
 
 module.exports = {
-	parseAgency, lineTypes,
+	parseAgency, modes, products,
 	parseDate, parseTime, daysBetween,
 	weekdays, isWeekday, allDaysOfWeekday,
 	readCsv, writeNdjson
