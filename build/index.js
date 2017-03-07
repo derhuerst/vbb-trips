@@ -52,20 +52,34 @@ so(function* () {
 	for (let id in trips) {
 		const trip = trips[id]
 		const line = lines[trip.lineId]
+		if (!line) {
+			console.warn(`line ${trip.lineId} for trip ${id} does not exist`)
+			continue
+		}
 		const schedule = schedules[scheduleIds.get(trip.scheduleId)]
-		if (!schedule) continue
+		if (!schedule) {
+			console.warn(`schedule ${trip.scheduleId} for trip ${id} does not exist`)
+			continue
+		}
 
-		let signature = ''
-		for (let stop of trip.stops) {signature += ',' + stop.s + ',' + stop.t}
-		signature = hash(signature)
+		const signature = hash(trip.stops.map((stop) => stop.s + ',' + stop.t).join(';'))
 
-		const starts = schedule.days.map((d) => (d + trip.start) / 1000)
-		if (signature in line.routes) line.routes[signature].when =
-			line.routes[signature].when.concat(starts)
-		else line.routes[signature] = {
-			  lineId: line.id
-			, stops:  trip.stops
-			, when:   starts
+		if (line.routes[signature]) {
+			const route = line.routes[signature]
+			route.starts = route.starts.concat(trip.start)
+		} else {
+			line.routes[signature] = {
+				type: 'schedule',
+				id: signature,
+				route: {
+					type: 'route',
+					id: signature,
+					line: line.id,
+					stops: trip.stops.map((stop) => stop.s)
+				},
+				sequence: trip.stops.map((stop) => ({departure: stop.t})),
+				starts: [trip.start]
+			}
 		}
 
 		delete trips[trip.id]
@@ -77,7 +91,7 @@ so(function* () {
 	let dest = lib.writeNdjson('lines.ndjson')
 	for (let id in lines) {
 		const line = lines[id]
-		dest.write(pick(line, ['id', 'name', 'type']))
+		dest.write(pick(line, ['type', 'id', 'operator', 'name', 'mode', 'product']))
 	}
 	dest.end()
 
