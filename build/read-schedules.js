@@ -17,7 +17,8 @@ const readSchedules = so(function* () {
 		// assemble the list of days
 		for (let i = 0; i < lib.weekdays.length; i++) {
 			if (parseInt(sched[lib.weekdays[i]]))
-				days = days.concat(lib.allDaysOfWeekday(first, last, i))
+				days = days.concat(lib.allDaysOfWeekday(first, last, i)
+					.map((d) => d / 1000))
 		}
 
 		const id = parseInt(sched.service_id)
@@ -31,7 +32,7 @@ const readSchedules = so(function* () {
 		const sched = acc[parseInt(exception.service_id)]
 		if (!sched) return acc
 
-		const date = lib.parseDate(exception.date)
+		const date = lib.parseDate(exception.date) / 1000
 		const type = parseInt(exception.exception_type)
 		const i = sched.days.indexOf(date)
 		if (type > 0 && i < 0) sched.days.push(date) // add
