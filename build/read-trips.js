@@ -14,12 +14,13 @@ const readTrips = so(function* (scheduleIds) {
 		if (!scheduleId) console.error('Invalid service_id', trip.service_id)
 
 		trip = {
-			  id: trip.trip_id
-			, lineId:     trip.route_id
-			, shapeId: trip.shape_id
-			, scheduleId
-			, name:       trip.trip_short_name || trip.trip_headsign
-			, stops:      []
+			id: trip.trip_id,
+			lineId: trip.route_id,
+			shapeId: trip.shape_id,
+			scheduleId,
+			name: trip.trip_short_name || trip.trip_headsign,
+			stops: [],
+			start: null
 		}
 		acc[trip.id] = trip
 		return acc
@@ -30,7 +31,7 @@ const readTrips = so(function* (scheduleIds) {
 		if (!trip) return acc
 
 		const station = stop.stop_id
-		const when    = lib.parseTime(stop.departure_time)
+		const when    = lib.parseTime(stop.departure_time) / 1000
 
 		if (trip.stops.length === 0) trip.start = when
 		trip.stops.push({s: station, t: when - trip.start})

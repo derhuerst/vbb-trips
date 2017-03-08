@@ -8,6 +8,7 @@ const so       = require('so')
 const keyMap   = require('key-map')
 const hash     = require('shorthash').unique
 const pick     = require('lodash.pick')
+const uniq = require('lodash.uniq')
 const arrEqual = require('array-equal')
 const fs       = require('fs-promise')
 const path     = require('path')
@@ -64,10 +65,7 @@ so(function* () {
 
 		const signature = hash(trip.stops.map((stop) => stop.s + ',' + stop.t).join(';'))
 
-		if (line.routes[signature]) {
-			const route = line.routes[signature]
-			route.starts = route.starts.concat(trip.start)
-		} else {
+		if (!line.routes[signature]) {
 			line.routes[signature] = {
 				type: 'schedule',
 				id: signature,
@@ -78,9 +76,12 @@ so(function* () {
 					stops: trip.stops.map((stop) => stop.s)
 				},
 				sequence: trip.stops.map((stop) => ({departure: stop.t})),
-				starts: [trip.start]
+				starts: []
 			}
 		}
+
+		line.routes[signature].starts = line.routes[signature].starts
+			.concat(schedule.days.map((day) => day + trip.start))
 
 		delete trips[trip.id]
 	}
@@ -102,7 +103,9 @@ so(function* () {
 	for (let lineId in lines) {
 		const line = lines[lineId]
 		for (let signature in line.routes) {
-			dest.write(line.routes[signature])
+			const sched = line.routes[signature]
+			sched.starts = uniq(sched.starts) // todo: why are there duplicates?
+			dest.write(sched)
 		}
 	}
 	dest.end()
