@@ -4,8 +4,6 @@
 
 [![npm version](https://img.shields.io/npm/v/vbb-trips.svg)](https://www.npmjs.com/package/vbb-trips)
 [![build status](https://img.shields.io/travis/derhuerst/vbb-trips.svg)](https://travis-ci.org/derhuerst/vbb-trips)
-[![dependency status](https://img.shields.io/david/derhuerst/vbb-trips.svg)](https://david-dm.org/derhuerst/vbb-trips)
-[![dev dependency status](https://img.shields.io/david/dev/derhuerst/vbb-trips.svg)](https://david-dm.org/derhuerst/vbb-trips#info=devDependencies)
 ![ISC-licensed](https://img.shields.io/github/license/derhuerst/vbb-trips.svg)
 [![gitter channel](https://badges.gitter.im/derhuerst/vbb-rest.svg)](https://gitter.im/derhuerst/vbb-rest)
 
@@ -21,30 +19,59 @@ npm install vbb-trips
 
 ```js
 const data = require('vbb-trips')
-
-data.lines(true, '17289_700').then(console.log) // query a single line
-data.routes({lineId: '17289_700'}).on('data', console.log) // filter routes
 ```
 
-A route looks like this:
+`data.lines([promise], [id])` and `data.schedules([promise], [id])` return a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/promise) if `promise` is `true`. Otherwise, they return a [readable stream](https://nodejs.org/api/stream.html#stream_readable_streams) [in object mode](https://nodejs.org/api/stream.html#stream_object_mode).
+
+### lines
+
+```js
+data.lines(true, '17289_700') // query a single line
+.then(console.log, console.error)
+```
+
+This will give you `line` objects in the [*Friendly Public Transport Format*](https://github.com/public-transport/friendly-public-transport-format).
+
+```js
+[{
+	type: 'line',
+	id: '17289_700',
+	operator: '796',
+	name: '100',
+	mode: 'bus',
+	product: 'bus'
+}]
+```
+
+### schedules
+
+```
+data.schedules()
+.on('data', console.log)
+.on('error', console.error)
+```
+
+This will give you `schedule` objects in the [*Friendly Public Transport Format*](https://github.com/public-transport/friendly-public-transport-format).
 
 ```js
 {
-	lineId: '17289_700',
-	stops: [ // milliseconds since departure at first stop
-		{s: '070101006736', t: 0},
-		{s: '070101007156', t: 120000},
-		{s: '070101007309', t: 180000},
-		{s: '070101005243', t: 240000},
-		{s: '070101007160', t: 300000},
+	type: 'schedule',
+	id: 'Z2txwLd',
+	route: {
+		type: 'route',
+		id: 'Z2txwLd',
+		line: '4221_700',
+		stops: [
+			'750000105901' // station IDs
+			// …
+		]
+	},
+	sequence: [
+		{departure: 0}, // seconds since departure at first stop
 		// …
 	],
-	when: [ // these are timestamps of the first stop
-		1485152520000,
-		1485757320000,
-		1486362120000,
-		1486966920000,
-		1487571720000,
+	starts: [
+		1509978000 // Unix timestamp at the first stop
 		// …
 	]
 }
