@@ -1,12 +1,12 @@
 {
 	"name":              "vbb-trips",
 	"description":       "When do trains run where in VBB?",
-	"version":           "1.3.0",
+	"version":           "2.0.0",
 	"main":              "index.js",
 	"files":             ["index.js", "data/*"],
 	"keywords": [
 		"vbb", "berlin", "brandenburg", "public transport",
-		"lines", "trips", "journeys", "date", "time",
+		"lines", "trips", "journeys", "schedule",
 		"open data", "json", "ndjson", "gtfs"
 	],
 	"author":            "Jannis R <mail@jannisr.de>",
@@ -22,18 +22,18 @@
 	},
 	"devDependencies": {
 		"so":            "^1.0.1",
-		"got": "^6.6.3",
-		"key-map":       "^0.1",
+		"got": "^6.7.1",
+		"key-map": "^0.1.0",
 		"shorthash":     "^0.0.2",
 		"lodash.pick": "^4.4.0",
 		"lodash.uniq": "^4.5.0",
 		"array-equal":   "^1",
-		"fs-promise": "^1.0.0",
+		"fs-promise": "^2.0.0",
 		"moment": "^2.17.1",
 		"csv-parser": "^1.11",
 		"tape": "^4.6.3",
 		"tape-catch":    "^1.0.4",
-		"tap-min": "^1.2.0"
+		"tap-min": "^1.2.1"
 	},
 	"scripts": {
 		"download": "./download.sh",
