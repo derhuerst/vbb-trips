@@ -98,8 +98,8 @@ so(function* () {
 
 
 
-	console.info('Writing routes.')
-	dest = lib.writeNdjson('routes.ndjson')
+	console.info('Writing schedules.')
+	dest = lib.writeNdjson('schedules.ndjson')
 	for (let lineId in lines) {
 		const line = lines[lineId]
 		for (let signature in line.routes) {

@@ -55,9 +55,9 @@ const selector = (file) => function (/* promised, pattern */) {
 	else return stream
 }
 
-const lines  = selector('lines.ndjson')
-const routes = selector('routes.ndjson')
+const lines = selector('lines.ndjson')
+const schedules = selector('schedules.ndjson')
 
 
 
-module.exports = {filterById, filterByKeys, lines, routes}
+module.exports = {filterById, filterByKeys, lines, schedules}

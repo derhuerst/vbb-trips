@@ -29,7 +29,7 @@ test('load single line', (t) => {
 })
 
 test('load multiple schedules', (t) => {
-	data.routes()
+	data.schedules()
 	.pipe(filter.obj((sched) => sched.route.line === '17525_400'))
 	.on('data', (sched) => {
 		const route = sched.route
