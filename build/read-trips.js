@@ -16,7 +16,7 @@ const readTrips = so(function* (scheduleIds) {
 		trip = {
 			id: trip.trip_id,
 			lineId: trip.route_id,
-			shapeId: trip.shape_id,
+			shape: trip.shape_id,
 			scheduleId,
 			name: trip.trip_short_name || trip.trip_headsign,
 			stops: [],
