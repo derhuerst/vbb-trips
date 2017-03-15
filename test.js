@@ -45,6 +45,9 @@ test('load multiple schedules', (t) => {
 			t.equal(typeof item.departure, 'number')
 			if ('arrival' in item) t.equal(typeof item.arrival, 'number')
 		}
+
+		t.equal(typeof sched.shape, 'string')
+		t.ok(sched.shape)
 	})
 	.on('end', () => t.end())
 })

@@ -73,7 +73,8 @@ This will give you `schedule` objects in the [*Friendly Public Transport Format*
 	starts: [
 		1509978000 // Unix timestamp at the first stop
 		// …
-	]
+	],
+	shape: '7' // see derheurst/vbb-shapes
 }
 ```
 

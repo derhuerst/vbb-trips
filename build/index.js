@@ -76,7 +76,8 @@ so(function* () {
 					stops: trip.stops.map((stop) => stop.s)
 				},
 				sequence: trip.stops.map((stop) => ({departure: stop.t})),
-				starts: []
+				starts: [],
+				shape: trip.shape
 			}
 		}
 
