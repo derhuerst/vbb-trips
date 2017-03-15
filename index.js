@@ -46,10 +46,12 @@ const selector = (file) => function (/* promised, pattern */) {
 	let stream = fs.createReadStream(path.join(base, file))
 	.pipe(ndjson.parse()).pipe(map.obj(decompress))
 
-	if ('string' === typeof pattern && pattern !== 'all')
-		stream = stream.pipe(filter.obj(filterById(pattern)))
-	else if (pattern)
-		stream = stream.pipe(filter.obj(filterByKeys(pattern)))
+	if (pattern !== 'all') {
+		if ('string' === typeof pattern)
+			stream = stream.pipe(filter.obj(filterById(pattern)))
+		else if (pattern)
+			stream = stream.pipe(filter.obj(filterByKeys(pattern)))
+	}
 
 	if (promised === true) return toPromise(stream)
 	else return stream
