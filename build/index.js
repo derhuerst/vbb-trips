@@ -12,6 +12,7 @@ const uniq = require('lodash.uniq')
 const arrEqual = require('array-equal')
 const fs       = require('fs-promise')
 const path     = require('path')
+const weights = require('vbb-mode-weights')
 
 const lib           = require('./lib')
 const readLines     = require('./read-lines')
@@ -89,11 +90,33 @@ so(function* () {
 
 
 
+	console.info('Computing line weights.')
+	for (let id in lines) {
+		const line = lines[id]
+		line.weight = 0
+
+		for (let signature in line.routes) {
+			const schedule = line.routes[signature]
+			const starts = schedule.starts.length
+
+			for (let stop of schedule.sequence) {
+				if (stop.arrival) line.weight += starts
+				if (stop.departure) line.weight += starts
+			}
+		}
+
+		line.weight = Math.round(line.weight * weights[line.product])
+	}
+
+
+
 	console.info('Writing lines.')
 	let dest = lib.writeNdjson('lines.ndjson')
 	for (let id in lines) {
 		const line = lines[id]
-		dest.write(pick(line, ['type', 'id', 'operator', 'name', 'mode', 'product']))
+		dest.write(pick(line, [
+			'type', 'id', 'operator', 'name', 'mode', 'product', 'weight'
+		]))
 	}
 	dest.end()
 

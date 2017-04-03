@@ -39,7 +39,8 @@ This will give you `line` objects in the [*Friendly Public Transport Format*](ht
 	operator: '796',
 	name: '100',
 	mode: 'bus',
-	product: 'bus'
+	product: 'bus',
+	weight: 392507
 }]
 ```
 
