@@ -13,7 +13,7 @@ const assertValidTimestamp = (test, t) => {
 
 
 test('load single line', (t) => {
-	t.plan(3)
+	t.plan(5)
 
 	data.lines(true, '17525_400')
 	.then((lines) => {
@@ -22,6 +22,8 @@ test('load single line', (t) => {
 
 		t.equal(typeof line.name, 'string')
 		t.equal(typeof line.type, 'string')
+		t.equal(typeof line.weight, 'number')
+		t.ok(line.weight > 10000)
 		// todo
 		// t.equal(typeof line.shapeId, 'string')
 	})
