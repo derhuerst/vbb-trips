@@ -1,7 +1,7 @@
 {
 	"name":              "vbb-trips",
 	"description":       "When do trains run where in VBB?",
-	"version":           "2.3.0",
+	"version":           "2.4.0",
 	"main":              "index.js",
 	"files":             ["index.js", "data/*"],
 	"keywords": [
@@ -41,6 +41,6 @@
 		"cleanup": "rm build/data/*.txt",
 		"build": "npm run download && node build/index.js && npm run cleanup",
 		"test": "tape test.js | tap-min",
-		"prepublish": "npm run build && npm test"
+		"prepublishOnly": "npm run build && npm test"
 	}
 }
