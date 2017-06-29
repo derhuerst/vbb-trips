@@ -24,7 +24,7 @@ const readTrips = so(function* (scheduleIds) {
 		}
 		acc[trip.id] = trip
 		return acc
-	}, {})
+	}, Object.create(null))
 
 	trips = yield lib.readCsv('stop_times.txt', (acc, stop) => {
 		const trip = acc[stop.trip_id]

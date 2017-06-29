@@ -16,6 +16,6 @@ const readLines = () => lib.readCsv('routes.txt', (acc, line) => {
 		routes: {} // temporarily used, not written to disk
 	}
 	return acc
-}, {})
+}, Object.create(null))
 
 module.exports = readLines

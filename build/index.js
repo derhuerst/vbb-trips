@@ -64,7 +64,7 @@ so(function* () {
 			continue
 		}
 
-		const signature = hash(trip.stops.map((stop) => stop.s + ',' + stop.t).join(';'))
+		const signature = hash(line.id + trip.stops.map((stop) => stop.s + ',' + stop.t).join(';'))
 
 		if (!line.routes[signature]) {
 			line.routes[signature] = {
