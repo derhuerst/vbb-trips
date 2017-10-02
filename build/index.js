@@ -10,7 +10,6 @@ const hash     = require('shorthash').unique
 const pick     = require('lodash.pick')
 const uniq = require('lodash.uniq')
 const arrEqual = require('array-equal')
-const fs       = require('fs-promise')
 const path     = require('path')
 const weights = require('vbb-mode-weights')
 
