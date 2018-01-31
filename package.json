@@ -1,7 +1,7 @@
 {
 	"name": "vbb-trips",
 	"description": "When do trains run where in VBB?",
-	"version": "2.10.0",
+	"version": "2.11.0",
 	"main": "index.js",
 	"files": [
 		"index.js",
@@ -37,8 +37,8 @@
 	"devDependencies": {
 		"array-equal": "^1",
 		"csv-parser": "^1.11",
-		"got": "^6.7.1",
-		"key-map": "^0.1.0",
+		"got": "^8.0.3",
+		"key-map": "^1.0.0",
 		"lodash.pick": "^4.4.0",
 		"lodash.uniq": "^4.5.0",
 		"moment": "^2.17.1",
