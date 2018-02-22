@@ -1,6 +1,8 @@
 'use strict'
 
-const {parseAgency, modes, products} = require('./lib')
+const {modes, products} = require('./lib')
+
+const parseAgency = (agency) => agency.replace(/[^a-zA-Z0-9]+$/, '')
 
 const readLines = (readFile) => {
 	const acc = Object.create(null) // by ID

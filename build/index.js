@@ -1,137 +1,99 @@
 'use strict'
 
-// This build script tries to reduce the amount of implicitly redundant data, coming from the GTFS dumps.
-// - calendar.txt and calendar_dates.txt get merged. For each schedule, only a list of days (on which they are valid) is kept.
-// - trips.txt and stop_time.txt get merged. Because relative travel times are used, a lot of now redundant trips can be removed.
+// This build script tries to reduce the amount of implicitly redundant
+// data in the GTFS dumps.
+// - calendar.txt and calendar_dates.txt get merged. For each service,
+//   only a list of days (on which they are valid) is kept.
+// - trips.txt and stop_time.txt get merged. Because relative travel
+//   times are used, a lot of now redundant trips can be removed.
 
-const so       = require('so')
-const keyMap   = require('key-map')
-const hash     = require('shorthash').unique
-const pick     = require('lodash.pick')
-const uniq = require('lodash.uniq')
-const arrEqual = require('array-equal')
-const path     = require('path')
-const weights = require('vbb-mode-weights')
+const path = require('path')
+const readCsv = require('gtfs-utils/read-csv')
+const so = require('so')
+const readServices = require('gtfs-utils/read-services-and-exceptions')
+const computeSchedules = require('gtfs-utils/compute-schedules')
+const modeWeights = require('vbb-mode-weights')
+const ndjson = require('ndjson')
+const fs = require('fs')
 
-const lib           = require('./lib')
-const readLines     = require('./read-lines')
-const readSchedules = require('./read-schedules')
-const readTrips     = require('./read-trips')
+const readLines = require('./read-lines')
+const readTrips = require('./read-trips')
 
-const dir = path.join(__dirname, 'data')
+const srcDir = path.join(__dirname, 'data')
+const destDir = path.join(__dirname, '..', 'data')
 
-so(function* () {
+const readFile = file => readCsv(path.join(srcDir, file + '.txt'))
 
+const TIMEZONE = 'Europe/Berlin'
+
+const unknownErr = (itemType, itemId, refType, refId) => {
+	return `unknwon ${itemType} '${itemId}' in ${refType} '${refId}'.`
+}
+
+const waitForFinish = (writable) => new Promise((resolve, reject) => {
+	writable.once('error', err => writable.destroy(err))
+	writable.once('end', (err) => {
+		if (err) reject(err)
+		else setTimeout(resolve, 0)
+	})
+})
+
+const roundTo = (v, p) => parseFloat(v.toFixed(p))
+
+so(function* () { // todo: async/await
 	console.info('Reading lines.')
-	const lines = yield readLines()
-
-	console.info('Reading schedules.')
-	let schedules = yield readSchedules()
-	const scheduleIds = keyMap(Object.keys(schedules))
-
-	for (let id1 in schedules) {
-		const schedule1 = schedules[id1]
-		for (let id2 in schedules) {
-			const schedule2 = schedules[id2]
-			if (schedule1.id === schedule2.id) continue
-
-			if (arrEqual(schedule1.days, schedule2.days)) {
-				console.info(schedule2.id + ' -> ' + schedule1.id)
-				scheduleIds.map(schedule2.id, schedule1.id)
-				delete schedules[schedule2.id]
-				break
-			}
-		}
-	}
-
-
+	const lines = yield readLines(readFile)
 
 	console.info('Reading trips.')
-	let trips = yield readTrips(scheduleIds)
+	let trips = yield readTrips(readFile)
 
-	console.info('Reducing trips into lines.')
-	for (let id in trips) {
-		const trip = trips[id]
-		const line = lines[trip.lineId]
-		if (!line) {
-			console.warn(`line ${trip.lineId} for trip ${id} does not exist`)
-			continue
-		}
-		const schedule = schedules[scheduleIds.get(trip.scheduleId)]
-		if (!schedule) {
-			console.warn(`schedule ${trip.scheduleId} for trip ${id} does not exist`)
-			continue
-		}
+	console.info('Reading services.')
+	const services = yield readServices(readFile, TIMEZONE)
 
-		const signature = hash(line.id + trip.stops.map((stop) => stop.s + ',' + stop.t).join(';'))
-
-		if (!line.routes[signature]) {
-			line.routes[signature] = {
-				type: 'schedule',
-				id: signature,
-				route: {
-					type: 'route',
-					id: signature,
-					line: line.id,
-					stops: trip.stops.map((stop) => stop.s)
-				},
-				sequence: trip.stops.map((stop) => ({departure: stop.t})),
-				starts: [],
-				shape: trip.shape
-			}
-		}
-
-		line.routes[signature].starts = line.routes[signature].starts
-			.concat(schedule.days.map((day) => day + trip.start))
-
-		delete trips[trip.id]
-	}
-
-
+	console.info('Computing schedules.')
+	const schedules = yield computeSchedules(readFile)
 
 	console.info('Computing line weights.')
-	for (let id in lines) {
-		const line = lines[id]
-		line.weight = 0
+	for (let signature in schedules) {
+		const sched = schedules[signature]
 
-		for (let signature in line.routes) {
-			const schedule = line.routes[signature]
-			const starts = schedule.starts.length
+		let scheduleWeight = 0
+		for (let arr of sched.arrivals) {
+			if ('number' === typeof arr) scheduleWeight++
+		}
+		for (let dep of sched.departures) {
+			if ('number' === typeof dep) scheduleWeight++
+		}
 
-			for (let stop of schedule.sequence) {
-				if (stop.arrival) line.weight += starts
-				if (stop.departure) line.weight += starts
+		for (let ref of sched.trips) {
+			const trip = trips[ref.tripId]
+			if (!trip) {
+				console.error(unknownErr('trip', ref.tripId, 'schedule', sched.id))
+				continue
 			}
-		}
+			const line = lines[trip.lineId]
+			if (!line) {
+				console.error(unknownErr('line', trip.lineId, 'trip', trip.id))
+				continue
+			}
+			const service = services[trip.serviceId]
+			if (!service) {
+				console.error(unknownErr('service', trip.serviceId, 'trip', trip.id))
+				continue
+			}
+			const modeWeight = modeWeights[line.product]
+			if ('number' !== typeof modeWeight) {
+				console.error(unknownErr('product', line.product, 'line', line.id))
+				continue
+			}
 
-		line.weight = Math.round(line.weight * weights[line.product])
-	}
-
-
-
-	console.info('Writing lines.')
-	let dest = lib.writeNdjson('lines.ndjson')
-	for (let id in lines) {
-		const line = lines[id]
-		dest.write(pick(line, [
-			'type', 'id', 'operator', 'name', 'mode', 'product', 'weight'
-		]))
-	}
-	dest.end()
-
-
-
-	console.info('Writing schedules.')
-	dest = lib.writeNdjson('schedules.ndjson')
-	for (let lineId in lines) {
-		const line = lines[lineId]
-		for (let signature in line.routes) {
-			const sched = line.routes[signature]
-			sched.starts = uniq(sched.starts) // todo: why are there duplicates?
-			dest.write(sched)
+			// for each day in the service
+			// for each arrival/departure in the schedule
+			line.weight += service.length * scheduleWeight * modeWeight
 		}
 	}
-	dest.end()
-
 })()
-.catch((err) => console.error(err.stack))
+.catch((err) => {
+	console.error(err)
+	process.exitCode = 1
+})
