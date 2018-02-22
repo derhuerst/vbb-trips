@@ -13,11 +13,14 @@ const so = require('so')
 const readServices = require('gtfs-utils/read-services-and-exceptions')
 const computeSchedules = require('gtfs-utils/compute-schedules')
 const modeWeights = require('vbb-mode-weights')
+const shorthash = require('shorthash').unique
 const ndjson = require('ndjson')
 const fs = require('fs')
+// const uniq = require('lodash.uniq') // todo
 
 const readLines = require('./read-lines')
 const readTrips = require('./read-trips')
+// const lib           = require('./lib')
 
 const srcDir = path.join(__dirname, 'data')
 const destDir = path.join(__dirname, '..', 'data')
@@ -32,7 +35,7 @@ const unknownErr = (itemType, itemId, refType, refId) => {
 
 const waitForFinish = (writable) => new Promise((resolve, reject) => {
 	writable.once('error', err => writable.destroy(err))
-	writable.once('end', (err) => {
+	writable.once('finish', (err) => {
 		if (err) reject(err)
 		else setTimeout(resolve, 0)
 	})
@@ -41,19 +44,16 @@ const waitForFinish = (writable) => new Promise((resolve, reject) => {
 const roundTo = (v, p) => parseFloat(v.toFixed(p))
 
 so(function* () { // todo: async/await
-	console.info('Reading lines.')
+	console.info('Reading lines, trips and services.')
 	const lines = yield readLines(readFile)
-
-	console.info('Reading trips.')
 	let trips = yield readTrips(readFile)
-
-	console.info('Reading services.')
 	const services = yield readServices(readFile, TIMEZONE)
 
 	console.info('Computing schedules.')
 	const schedules = yield computeSchedules(readFile)
+	const routeSchedules = Object.create(null)
 
-	console.info('Computing line weights.')
+	console.info('Computing per-route schedules & line weights.')
 	for (let signature in schedules) {
 		const sched = schedules[signature]
 
@@ -90,8 +90,66 @@ so(function* () { // todo: async/await
 			// for each day in the service
 			// for each arrival/departure in the schedule
 			line.weight += service.length * scheduleWeight * modeWeight
+
+			const routeId = shorthash([
+				sched.id, // prevent two schedules per route
+				line.id, // prevent two lines per route
+				...sched.stops
+			].join('\xff'))
+			let routeSchedule = routeSchedules[routeId]
+			if (routeSchedule) {
+				for (let day of service) {
+					const t = day + ref.start
+					if (!routeSchedule.starts.includes(t)) {
+						routeSchedule.starts.push(t)
+					}
+				}
+			} else {
+				routeSchedule = routeSchedules[routeId] = {
+					id: sched.id,
+					route: {
+						type: 'route',
+						id: routeId,
+						line: line.id,
+						stops: sched.stops
+					},
+					sequence: [],
+					starts: service.map(day => day + ref.start),
+					// todo: shape
+				}
+				for (let i = 0; i < sched.arrivals.length; i++) {
+					routeSchedule.sequence.push({
+						departure: sched.departures[i],
+						arrival: sched.arrivals[i]
+					})
+				}
+			}
 		}
 	}
+
+	console.info('Writing lines.')
+	let convert = ndjson.stringify()
+	let dest = fs.createWriteStream(path.join(destDir, 'lines.ndjson'))
+	convert.pipe(dest)
+
+	for (let id in lines) {
+		const line = lines[id]
+		line.weight = roundTo(line.weight, 6 - Math.log10(line.weight) | 0)
+		convert.write(line)
+	}
+	convert.end()
+	yield waitForFinish(dest)
+
+	console.info('Writing schedules.')
+	convert = ndjson.stringify()
+	dest = fs.createWriteStream(path.join(destDir, 'schedules.ndjson'))
+	convert.pipe(dest)
+
+	for (let signature in routeSchedules) {
+		convert.write(routeSchedules[signature])
+	}
+	convert.end()
+	yield waitForFinish(dest)
 })()
 .catch((err) => {
 	console.error(err)

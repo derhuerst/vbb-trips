@@ -36,6 +36,7 @@
 	},
 	"devDependencies": {
 		"gtfs-utils": "^0.4.0-alpha.7",
+		"shorthash": "0.0.2",
 		"so": "^1.0.1",
 		"tap-min": "^1.2.1",
 		"tape": "^4.6.3",
