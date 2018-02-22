@@ -1,21 +1,32 @@
 'use strict'
 
-const so       = require('so')
-const lib      = require('./lib')
+const {parseAgency, modes, products} = require('./lib')
 
-
-
-const readLines = () => lib.readCsv('routes.txt', (acc, line) => {
-	acc[line.route_id] = {
-		type: 'line',
-		id: line.route_id,
-		operator: lib.parseAgency(line.agency_id),
-		name: line.route_short_name || line.route_long_name,
-		mode: lib.modes[line.route_type] || null,
-		product: lib.products[line.route_type] || 'unknown',
-		routes: {} // temporarily used, not written to disk
+const readLines = (readFile) => {
+	const acc = Object.create(null) // by ID
+	const onLine = (l) => {
+		acc[l.route_id] = {
+			type: 'line',
+			id: l.route_id,
+			operator: parseAgency(l.agency_id),
+			name: l.route_short_name || l.route_long_name,
+			mode: modes[l.route_type] || null,
+			product: products[l.route_type] || 'unknown',
+			weight: 0 // accumulated to later
+		}
+		if (acc[l.route_id].product === 'unknown') console.error(l.route_type)
 	}
-	return acc
-}, Object.create(null))
+
+	const lines = readFile('routes')
+	lines.on('data', onLine)
+
+	return new Promise((resolve, reject) => {
+		lines.once('error', err => lines.destroy(err))
+		lines.once('end', (err) => {
+			if (err) reject(err)
+			else setImmediate(resolve, acc)
+		})
+	})
+}
 
 module.exports = readLines
