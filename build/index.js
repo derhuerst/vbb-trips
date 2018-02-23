@@ -114,8 +114,7 @@ so(function* () { // todo: async/await
 						stops: sched.stops
 					},
 					sequence: [],
-					starts: service.map(day => day + ref.start),
-					// todo: shape
+					starts: service.map(day => day + ref.start)
 				}
 				for (let i = 0; i < sched.arrivals.length; i++) {
 					routeSchedule.sequence.push({

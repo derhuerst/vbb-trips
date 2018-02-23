@@ -6,7 +6,6 @@ const readTrips = (readFile) => {
 		acc[t.trip_id] = {
 			id: t.trip_id,
 			lineId: t.route_id,
-			shapeId: t.shape_id,
 			serviceId: t.service_id,
 			name: t.trip_short_name || t.trip_headsign
 		}
