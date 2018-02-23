@@ -5,7 +5,7 @@ cd $(dirname $0)
 gzip='accept-encoding: gzip'
 base_url='https://vbb-gtfs.jannisr.de/latest/'
 download () {
-	wget -nc -qc --show-progress --header=$gzip -O data/$1 $base_url$1
+	wget -nc -qc --header=$gzip -O data/$1 $base_url$1
 }
 
 download 'agency.txt'
