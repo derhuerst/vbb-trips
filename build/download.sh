@@ -13,3 +13,5 @@ download 'calendar_dates.txt'
 download 'routes.txt'
 download 'stop_times.txt'
 download 'trips.txt'
+
+ls -lh *.txt
