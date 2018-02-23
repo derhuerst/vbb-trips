@@ -54,7 +54,10 @@ so(function* () { // todo: async/await
 	const routeSchedules = Object.create(null)
 
 	console.info('Computing per-route schedules & line weights.')
+	let i = 0
 	for (let signature in schedules) {
+		i++
+		if (i % 100 === 0) console.error('.')
 		const sched = schedules[signature]
 
 		let scheduleWeight = 0
