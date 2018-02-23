@@ -1,11 +1,10 @@
 #!/bin/sh
 
-cd $(dirname $0)
+cd $(dirname $0)/data
 
-gzip='accept-encoding: gzip'
 base_url='https://vbb-gtfs.jannisr.de/latest/'
 download () {
-	wget -nc -qc --header=$gzip -O data/$1 $base_url$1
+	wget -q -N -c --header='accept-encoding: gzip' $base_url$1
 }
 
 download 'agency.txt'
