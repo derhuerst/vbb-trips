@@ -36,6 +36,7 @@
 	},
 	"devDependencies": {
 		"gtfs-utils": "^0.4.0-alpha.7",
+		"rimraf": "^2.6.2",
 		"shorthash": "0.0.2",
 		"so": "^1.0.1",
 		"tap-min": "^1.2.1",
@@ -45,7 +46,7 @@
 	},
 	"scripts": {
 		"download": "./build/download.sh",
-		"cleanup": "rm build/data/*.txt",
+		"cleanup": "rimraf 'build/data/*.txt'",
 		"build": "npm run download && node build/index.js && npm run cleanup",
 		"test": "tape test.js | tap-min",
 		"prepublishOnly": "npm run build && npm test"
