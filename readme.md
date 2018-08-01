@@ -1,6 +1,6 @@
 # vbb-trips 🚏
 
-**Raw data about when VBB trains stop at which stations.** Computed from [open](https://daten.berlin.de/datensaetze/vbb-fahrplandaten-mitte-mai-2018-bis-mitte-dezember-2018) [GTFS](https://developers.google.com/transit/gtfs/) [data](https://vbb-gtfs.jannisr.de/).
+**Raw data about when VBB trains stop at which stations.** Computed from [open](https://daten.berlin.de/datensaetze/vbb-fahrplandaten-mitte-juli-2018-bis-mitte-dezember-2018) [GTFS](https://developers.google.com/transit/gtfs/) [data](https://vbb-gtfs.jannisr.de/).
 
 [![npm version](https://img.shields.io/npm/v/vbb-trips.svg)](https://www.npmjs.com/package/vbb-trips)
 [![build status](https://img.shields.io/travis/derhuerst/vbb-trips.svg)](https://travis-ci.org/derhuerst/vbb-trips)
