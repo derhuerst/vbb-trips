@@ -1,7 +1,7 @@
 {
 	"name": "vbb-trips",
 	"description": "When do trains run where in VBB?",
-	"version": "3.6.0",
+	"version": "3.7.0",
 	"main": "index.js",
 	"files": [
 		"index.js",
@@ -35,7 +35,7 @@
 		"through2-map": "^3.0.0"
 	},
 	"devDependencies": {
-		"gtfs-utils": "^0.5.1",
+		"gtfs-utils": "^0.6.0",
 		"rimraf": "^2.6.2",
 		"shorthash": "0.0.2",
 		"so": "^1.0.1",
