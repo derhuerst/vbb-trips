@@ -2,9 +2,9 @@
 
 // This build script tries to reduce the amount of implicitly redundant
 // data in the GTFS dumps.
-// - calendar.txt and calendar_dates.txt get merged. For each service,
+// - calendar.csv and calendar_dates.csv get merged. For each service,
 //   only a list of days (on which they are valid) is kept.
-// - trips.txt and stop_time.txt get merged. Because relative travel
+// - trips.csv and stop_time.csv get merged. Because relative travel
 //   times are used, a lot of now redundant trips can be removed.
 
 const path = require('path')
@@ -25,7 +25,7 @@ const readTrips = require('./read-trips')
 const srcDir = path.join(__dirname, 'data')
 const destDir = path.join(__dirname, '..', 'data')
 
-const readFile = file => readCsv(path.join(srcDir, file + '.txt'))
+const readFile = file => readCsv(path.join(srcDir, file + '.csv'))
 
 const TIMEZONE = 'Europe/Berlin'
 

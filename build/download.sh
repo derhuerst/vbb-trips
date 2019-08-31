@@ -7,11 +7,11 @@ download () {
 	curl -s -z --compressed $base_url$1 >$1
 }
 
-download 'agency.txt'
-download 'calendar.txt'
-download 'calendar_dates.txt'
-download 'routes.txt'
-download 'stop_times.txt'
-download 'trips.txt'
+download 'agency.csv'
+download 'calendar.csv'
+download 'calendar_dates.csv'
+download 'routes.csv'
+download 'stop_times.csv'
+download 'trips.csv'
 
-ls -lh *.txt
+ls -lh *.csv
