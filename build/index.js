@@ -30,7 +30,7 @@ const readFile = file => readCsv(path.join(srcDir, file + '.csv'))
 const TIMEZONE = 'Europe/Berlin'
 
 const unknownErr = (itemType, itemId, refType, refId) => {
-	return `unknwon ${itemType} '${itemId}' in ${refType} '${refId}'.`
+	return `unknown ${itemType} '${itemId}' in ${refType} '${refId}'.`
 }
 
 const waitForFinish = (writable) => new Promise((resolve, reject) => {
