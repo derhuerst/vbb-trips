@@ -35,7 +35,7 @@
 		"through2-map": "^3.0.0"
 	},
 	"devDependencies": {
-		"gtfs-utils": "^1.0.0",
+		"gtfs-utils": "^1.0.2",
 		"rimraf": "^3.0.0",
 		"shorthash": "0.0.2",
 		"so": "^1.0.1",
