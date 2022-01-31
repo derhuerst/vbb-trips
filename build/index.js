@@ -13,13 +13,13 @@ const readServices = require('gtfs-utils/read-services-and-exceptions')
 const computeSchedules = require('gtfs-utils/compute-schedules')
 const modeWeights = require('vbb-mode-weights')
 const shorthash = require('shorthash').unique
+const resolveTime = require('gtfs-utils/lib/resolve-time')
 const ndjson = require('ndjson')
 const fs = require('fs')
 // const uniq = require('lodash.uniq') // todo
 
 const readLines = require('./read-lines')
 const readTrips = require('./read-trips')
-// const lib           = require('./lib')
 
 const srcDir = path.join(__dirname, 'data')
 const destDir = path.join(__dirname, '..', 'data')
@@ -46,7 +46,10 @@ const roundTo = (v, p) => parseFloat(v.toFixed(p))
 	console.info('Reading lines, trips and services.')
 	const lines = await readLines(readFile)
 	let trips = await readTrips(readFile)
-	const services = await readServices(readFile, TIMEZONE)
+	const services = new Map() // service ID -> [date]
+	for await (const [id, dates] of readServices(readFile, TIMEZONE)) {
+		services.set(id, dates)
+	}
 
 	console.info('Computing schedules.')
 	const schedules = await computeSchedules(readFile)
@@ -54,10 +57,9 @@ const roundTo = (v, p) => parseFloat(v.toFixed(p))
 
 	console.info('Computing per-route schedules & line weights.')
 	let i = 0
-	for (let signature in schedules) {
+	for await (const sched of schedules.values()) {
 		i++
 		if (i % 100 === 0) console.error('.')
-		const sched = schedules[signature]
 
 		let scheduleWeight = 0
 		for (let arr of sched.arrivals) {
@@ -78,11 +80,11 @@ const roundTo = (v, p) => parseFloat(v.toFixed(p))
 				console.error(unknownErr('line', trip.lineId, 'trip', trip.id))
 				continue
 			}
-			const service = services[trip.serviceId]
-			if (!service) {
+			if (!services.has(trip.serviceId)) {
 				console.error(unknownErr('service', trip.serviceId, 'trip', trip.id))
 				continue
 			}
+			const dates = services.get(trip.serviceId)
 			const modeWeight = modeWeights[line.product]
 			if ('number' !== typeof modeWeight) {
 				console.error(unknownErr('product', line.product, 'line', line.id))
@@ -91,7 +93,7 @@ const roundTo = (v, p) => parseFloat(v.toFixed(p))
 
 			// for each day in the service
 			// for each arrival/departure in the schedule
-			line.weight += service.length * scheduleWeight * modeWeight
+			line.weight += dates.length * scheduleWeight * modeWeight
 
 			const routeId = shorthash([
 				sched.id, // prevent two schedules per route
@@ -100,8 +102,8 @@ const roundTo = (v, p) => parseFloat(v.toFixed(p))
 			].join('\xff'))
 			let routeSchedule = routeSchedules[routeId]
 			if (routeSchedule) {
-				for (let day of service) {
-					const t = day + ref.start
+				for (const date of dates) {
+					const t = resolveTime(TIMEZONE, date, ref.start)
 					if (!routeSchedule.starts.includes(t)) {
 						routeSchedule.starts.push(t)
 					}
@@ -116,7 +118,9 @@ const roundTo = (v, p) => parseFloat(v.toFixed(p))
 						stops: sched.stops
 					},
 					sequence: [],
-					starts: service.map(day => day + ref.start)
+					starts: dates.map((date) => {
+						return resolveTime(TIMEZONE, date, ref.start)
+					}),
 				}
 				for (let i = 0; i < sched.arrivals.length; i++) {
 					routeSchedule.sequence.push({
