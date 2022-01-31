@@ -27,10 +27,10 @@
 	"bugs": "https://github.com/derhuerst/vbb-trips/issues",
 	"license": "ISC",
 	"engines": {
-		"node": ">=6"
+		"node": ">=16"
 	},
 	"dependencies": {
-		"ndjson": "^1.5.0",
+		"ndjson": "^2.0.0",
 		"stream-filter": "^2.1.0",
 		"through2-map": "^3.0.0"
 	},
@@ -38,9 +38,8 @@
 		"gtfs-utils": "^1.0.2",
 		"rimraf": "^3.0.0",
 		"shorthash": "0.0.2",
-		"so": "^1.0.1",
-		"tap-min": "^1.2.1",
-		"tape": "^4.6.3",
+		"tap-min": "^2.0.0",
+		"tape": "^5.5.0",
 		"tape-catch": "^1.0.4",
 		"vbb-mode-weights": "^0.2.0"
 	},

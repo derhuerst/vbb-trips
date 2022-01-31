@@ -9,7 +9,6 @@
 
 const path = require('path')
 const readCsv = require('gtfs-utils/read-csv')
-const so = require('so')
 const readServices = require('gtfs-utils/read-services-and-exceptions')
 const computeSchedules = require('gtfs-utils/compute-schedules')
 const modeWeights = require('vbb-mode-weights')
@@ -43,14 +42,14 @@ const waitForFinish = (writable) => new Promise((resolve, reject) => {
 
 const roundTo = (v, p) => parseFloat(v.toFixed(p))
 
-so(function* () { // todo: async/await
+;(async () => {
 	console.info('Reading lines, trips and services.')
-	const lines = yield readLines(readFile)
-	let trips = yield readTrips(readFile)
-	const services = yield readServices(readFile, TIMEZONE)
+	const lines = await readLines(readFile)
+	let trips = await readTrips(readFile)
+	const services = await readServices(readFile, TIMEZONE)
 
 	console.info('Computing schedules.')
-	const schedules = yield computeSchedules(readFile)
+	const schedules = await computeSchedules(readFile)
 	const routeSchedules = Object.create(null)
 
 	console.info('Computing per-route schedules & line weights.')
@@ -140,7 +139,7 @@ so(function* () { // todo: async/await
 		convert.write(line)
 	}
 	convert.end()
-	yield waitForFinish(dest)
+	await waitForFinish(dest)
 
 	console.info('Writing schedules.')
 	convert = ndjson.stringify()
@@ -151,9 +150,9 @@ so(function* () { // todo: async/await
 		convert.write(routeSchedules[signature])
 	}
 	convert.end()
-	yield waitForFinish(dest)
+	await waitForFinish(dest)
 })()
 .catch((err) => {
 	console.error(err)
-	process.exitCode = 1
+	process.exit(1)
 })
