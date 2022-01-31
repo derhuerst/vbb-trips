@@ -1,7 +1,7 @@
 {
 	"name": "vbb-trips",
 	"description": "When do trains run where in VBB?",
-	"version": "3.13.1",
+	"version": "4.0.0",
 	"main": "index.js",
 	"files": [
 		"index.js",
