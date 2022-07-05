@@ -6,14 +6,14 @@ const fs        = require('fs')
 const path      = require('path')
 const map       = require('through2-map')
 
-
+const hasProp = (o, k) => Object.prototype.hasOwnProperty.call(o, k)
 
 const filterById = (id) => (data) => data && data.id === id
 
 const filterByKeys = (pattern) => (data) => {
 	if (!data) return false
 	for (let key in pattern) {
-		if (!data.hasOwnProperty(key)) return false
+		if (!hasProp(data, key)) return false
 		if (data[key] !== pattern[key]) return false
 	}
 	return true
