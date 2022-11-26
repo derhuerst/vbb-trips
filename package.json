@@ -1,7 +1,7 @@
 {
 	"name": "vbb-trips",
 	"description": "When do trains run where in VBB?",
-	"version": "4.1.0",
+	"version": "4.2.0",
 	"main": "index.js",
 	"files": [
 		"index.js",
@@ -47,7 +47,7 @@
 	"scripts": {
 		"lint": "eslint .",
 		"download": "./build/download.sh",
-		"cleanup": "rimraf 'build/data/*.csv'",
+		"cleanup": "rimraf 'build/data/*.csv' 'build/data/*.csv.etag'",
 		"build": "npm run download && node build/index.js && npm run cleanup",
 		"test": "tape test.js | tap-min",
 		"prepublishOnly": "npm run lint && npm run build && npm test"
